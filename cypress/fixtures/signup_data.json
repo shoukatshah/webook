@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "first_name": "Shoukat",
+        "last_name": "SQAE",
+        "email": "nasr@gmail.com",
+        "confirm_email": "nasr@gmail.com",
+        "password": "Test123456",
+        "mobile_number": "568737489"
+    },
+    {
+        "id": 2,
+        "first_name": "Shoukat",
+        "last_name": "SQAE",
+        "email": "sar@gmail.com",
+        "confirm_email": "sar@gmail.com",
+        "password": "Test123456",
+        "mobile_number": "568737489"
+    }
+]

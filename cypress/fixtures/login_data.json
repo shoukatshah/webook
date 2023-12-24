@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "message": "correct email and correct password",
+        "email": "muhammad.shoukat@uxbert.com",
+        "password": "Test1234"
+    },
+    {
+        "id": 2,
+        "message": "correct email and incorrect password",
+        "email": "sqae@gmail.com",
+        "password": "Test123422"
+    },
+    {
+        "id": 3,
+        "message": "Incorrect email and correct password",
+        "email": "sqae11122@gmail.com",
+        "password": "Test1234"
+    },
+    {
+        "id": 4,
+        "message": "Incorrect email and incorrect password",
+        "email": "sqae11122@gmail.com",
+        "password": "Test123466666"
+    }
+]

@@ -1,0 +1,23 @@
+{
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "cypress-multi-reporters": "^1.6.4",
+    "cypress-xpath": "^2.0.1",
+    "mocha-junit-reporter": "^2.2.1",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0"
+    
+  },
+  "scripts": {
+    "cypress:run": "cypress run",
+    "cypress:merge": "mochawesome-merge --reportDir cypress/reports/mocha > cypress/reports/mochareports/report.json",
+    "cypress:report": "marge cypress/reports/mochareports/report.json -f cypress/reports/mochareports",
+    "cy:run": "npm run cypress:run && npm run cypress:merge && npm run cypress:report"
+  },
+
+  "reporter":"cypress-multi-reporters",
+  "reporterOptions": {
+  "configFile": "reporter-config.json"
+}
+}
