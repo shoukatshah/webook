@@ -8,7 +8,7 @@ class Login {
                 cy.get('input[type="password"]').click().type(password)
                 cy.contains('button', 'Login').click()
                 cy.intercept('POST', 'https://api.webook.rocks/api/v2/login').as('loginRequest')
-                cy.wait('@loginRequest').then((interception) => {
+                cy.wait('@loginRequest',{timeout:15000}).then((interception) => {
                     const requestPayload = interception.request.body
                     expect(requestPayload).to.have.property('email', email)
                     expect(requestPayload).to.have.property('password', password)

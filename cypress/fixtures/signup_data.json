@@ -18,3 +18,63 @@
         "mobile_number": "568737489"
     }
 ]
+
+
+
+const is_soldout = interception.response.body.data.is_soldout
+            const time_slots = interception.response.body.data.time_slots
+            cy.log('Here is timeslot: ', time_slots)
+            const is_seated = interception.response.body.data.is_seated
+            if (is_soldout === false && time_slots.length > 0) {
+                const firstDate = time_slots[0]
+                cy.log('Here is first date: ', firstDate)
+                const day = new Date(firstDate).getDate()
+                cy.log('Here is the day : ', day)
+                cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
+                // .invoke('text').then(dayText => {
+                //     if (day === Number(dayText) && dayText.length > 1) {
+                //       cy.log('Day found:', dayText)
+                //       dayText.click()
+                //     } else {
+                //       cy.log("Day doesn't match:", dayText)
+                //     }
+                //   })
+                // cy.get('button[name="day"]').filter(':contains(' + day + ')').then(($element) => {
+                //     if ($element.length > 1) {
+                //         cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
+                //     }
+                //     else {
+                //         cy.contains(day).click()
+                //     }
+                // })
+                cy.intercept('GET', `https://api.webook.rocks/api/v2/event-detail/disney-the-castle-gold/timeslot-capacity?time_slot=${firstDate}&visible_in=rs`).as('timeslotCapacity')
+                cy.wait('@timeslotCapacity', { timeout: 10000 }).then((interception) => {
+                    const dataObject = interception.response.body.data[0]
+                    const isSeatsAvailable = Object.values(dataObject).slice(-3).some(value => value > 0)
+                    if (isSeatsAvailable) {
+
+                        cy.log('Seats available')
+                        // cy.log('Time from is :', JSON.stringify(interception.response.body.data[0].time_from))
+                        const timestamp = interception.response.body.data[0].time_from
+                        const dateObject = new Date(timestamp)
+                        // const timeString = dateObject.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        // cy.log('Time from is:', timeString)
+
+
+                    } else {
+                        cy.log('Time slot is fully booked')
+                    }
+                })
+                if (is_seated) {
+                    cy.log('Event is seated')
+                }
+                else {
+                    cy.log('Event is non seated')
+                }
+            }
+            else {
+                cy.log('Event has soldout')
+                cy.xpath('//*[@id="booking-section-ref"]/div/div/div/div/p').invoke('text').then((text) => {
+                    expect(text).to.equal('Unfortunately, there are no available tickets for this event at the moment. Please try again later.')
+                })
+            }
