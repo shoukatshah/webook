@@ -30,43 +30,52 @@ class Booking {
                 cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
                 cy.intercept('GET', `https://api.webook.rocks/api/v2/event-detail/disney-the-castle-gold/timeslot-capacity?time_slot=${firstDate}&visible_in=rs`).as('timeslotCapacity')
                 cy.wait('@timeslotCapacity', { timeout: 10000 }).then((interception) => {
-                    const start_time = new Date(interception.response.body.data[0].time_from)
-                    const formattedTime = start_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                    cy.contains(`${formattedTime}`).click()
-                    cy.contains('button', 'Select Tickets').click({ force: true })
-                    cy.xpath('/html/body/div[1]/main/section/div/div[2]/div[2]/div/div/ul/li[3]/div[1]/div[2]/div[2]/button[2]').click()
-                    cy.contains('button', 'Next').click()
-                    cy.intercept('POST', 'https://api.webook.rocks/api/v2/checkout?lang=en').as('checkOut')
-                    cy.contains('button', 'Select Payment').click()
-                    cy.get('input[type = checkbox]').each(($chekbox) => {
-                        cy.wrap($chekbox).check()
-                    })
-                    cy.contains('button', 'Proceed to Payment').click({ force: true })
-                    cy.wait('@checkOut').then((interception) => {
-                        const status = interception.response.body.status
-                        const resp = interception.response.body.message
-                        if (status === "error") {
-                            cy.log(resp.time_slots)
-                        }
-                        else {
-                            cy.origin('https://secure.paytabs.sa', () => {
-                                cy.wait(2000)
-                                cy.get('#number').type('4111111111111111')
-                                cy.get('#expmonth').type('12')
-                                cy.get('#expyear').type('25')
-                                cy.get('#cvv').type('123')
-                                cy.get('#payBtn').click()
-                                cy.wait(2000)
-                                cy.contains('Please wait while redirecting').should('be.visible')
-                            })
-                            cy.wait(30000)
-                            cy.contains('Back to my orders').should('be.visible')
-                        }
-                    })
+                    const is_sold = interception.response.body.data[0].is_soldout
+                    if (is_sold === false) {
+                        const start_time = new Date(interception.response.body.data[0].time_from)
+                        const formattedTime = start_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                        cy.contains(`${formattedTime}`).click()
+                        cy.contains('button', 'Select Tickets').click({ force: true })
+                        cy.xpath('/html/body/div[1]/main/section/div/div[2]/div[2]/div/div/ul/li[3]/div[1]/div[2]/div[2]/button[2]').click()
+                        cy.contains('button', 'Next').click()
+                        cy.intercept('POST', 'https://api.webook.rocks/api/v2/checkout?lang=en').as('checkOut')
+                        cy.contains('button', 'Select Payment').click()
+                        cy.get('input[type = checkbox]').each(($chekbox) => {
+                            cy.wrap($chekbox).check()
+                        })
+                        cy.contains('button', 'Proceed to Payment').click({ force: true })
+                        cy.wait('@checkOut').then((interception) => {
+                            const status = interception.response.body.status
+                            const resp = interception.response.body.message
+                            if (status === "error") {
+                                cy.log(resp.time_slots)
+                            }
+                            else {
+                                cy.origin('https://secure.paytabs.sa', () => {
+                                    cy.wait(2000)
+                                    cy.get('#number').type('4111111111111111')
+                                    cy.get('#expmonth').type('12')
+                                    cy.get('#expyear').type('25')
+                                    cy.get('#cvv').type('123')
+                                    cy.get('#payBtn').click()
+                                    cy.wait(2000)
+                                    cy.contains('Please wait while redirecting').should('be.visible')
+                                })
+                                cy.wait(30000)
+                                cy.contains('Back to my orders').should('be.visible')
+                            }
+                        })
+
+                    }
+                    else {
+                        cy.log('Time slot has sold out')
+                    }
+
                 })
             }
             else {
-                cy.log('No available dates or event is sold out.')
+                cy.contains('Unfortunately, there are no available tickets for this event at the moment. Please try again later.').should('be.visible')
+                cy.log('Unfortunately, there are no available tickets for this event at the moment. Please try again later.')
             }
         })
     }
@@ -99,7 +108,9 @@ class Booking {
                 cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
                 cy.intercept('GET', `https://api.webook.rocks/api/v2/event-detail/disney-the-castle-gold/timeslot-capacity?time_slot=${firstDate}&visible_in=rs`).as('timeslotCapacity')
                 cy.wait('@timeslotCapacity', { timeout: 10000 }).then((interception) => {
-                    const start_time = new Date(interception.response.body.data[0].time_from)
+                    const is_sold = interception.response.body.data[0].is_soldout
+                    if(is_sold === false){
+                        const start_time = new Date(interception.response.body.data[0].time_from)
                     const formattedTime = start_time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                     cy.contains(`${formattedTime}`).click()
                     cy.contains('button', 'اختر التذاكر').click({ force: true })
@@ -132,10 +143,16 @@ class Booking {
                             cy.contains('العودة لقائمة الطلبات').should('be.visible')
                         }
                     })
+
+                    }
+                    else {
+                        cy.log('Time slot has sold out')
+                    }
                 })
             }
             else {
-                cy.log('No available dates or event is sold out.')
+                cy.contains('عذراً، لم بعد هناك أي تذاكر متاحة في الوقت الحالي. يرجى المحاولة مرة أخرى لاحقاً.').should('be.visible')
+                cy.log('عذراً، لم بعد هناك أي تذاكر متاحة في الوقت الحالي. يرجى المحاولة مرة أخرى لاحقاً.')
             }
         })
 

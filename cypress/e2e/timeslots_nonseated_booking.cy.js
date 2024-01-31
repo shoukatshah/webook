@@ -13,7 +13,7 @@ describe('Booking for  time slots non seated event', () => {
         cy.wait(2000)
         booking.bookingInEN()
     })
-    it.only('Booking in Arabic Language', () => {
+    it('Booking in Arabic Language', () => {
         cy.wait(2000)
         booking.bookingInAR()
     })
