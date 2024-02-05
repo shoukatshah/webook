@@ -23,8 +23,7 @@ class Booking {
         cy.wait('@eventDetailsRequest', { timeout: 10000 }).then((interception) => {
             const is_soldout = interception.response.body.data.is_soldout
             const time_slots = interception.response.body.data.time_slots
-            cy.log(`Here is soldout: ${is_soldout} and timeslots length: ${time_slots.length}`)
-            if (is_soldout === false || time_slots.length > 0) {
+            if (is_soldout === true || time_slots.length > 0) {
                 const firstDate = time_slots[0]
                 const day = new Date(firstDate).getDate()
                 cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
@@ -102,7 +101,7 @@ class Booking {
         cy.wait('@eventDetailsRequest', { timeout: 10000 }).then((interception) => {
             const is_soldout = interception.response.body.data.is_soldout
             const time_slots = interception.response.body.data.time_slots
-            if (is_soldout === false || time_slots.length > 0) {
+            if (is_soldout === true || time_slots.length > 0) {
                 const firstDate = time_slots[0]
                 const day = new Date(firstDate).getDate()
                 cy.get('button[name="day"]').filter(':contains(' + day + ')').eq(1).click()
